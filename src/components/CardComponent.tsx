@@ -1,57 +1,101 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import React from "react";
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
+import { useForm } from "react-hook-form";
+import axios from "axios"
 
 interface CardComponentProps {
-
+  city?: string;
 }
 
-const useStyles = makeStyles({
-  root: {
-    minWidth: 275,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-});
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1,
+    },
+    paper: {
+      padding: theme.spacing(2),
+      textAlign: "center",
+    },
+  })
+);
 
-export const CardComponent: React.FC<CardComponentProps> = ({}) => {
+export const CardComponent: React.FC<CardComponentProps> = ({ city }) => {
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
+  const {
+    register,
+    handleSubmit,
+    watch,
+    errors,
+  } = useForm<CardComponentProps>();
+
+  const onSubmit = (data: any) => {
+    city = JSON.stringify(data.city);
+    axios.get(BASE_URL).then((res) =>{
+      console.log(res);
+     }).catch((err) =>{
+       console.error(err);
+     })
+  };
+  const BASE_URL = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_API_KEY}`
+
 
   return (
-    <Card className={classes.root}>
-      <CardContent>
-        <Typography className={classes.title} color="textSecondary" gutterBottom>
-          Word of the Day
-        </Typography>
-        <Typography variant="h5" component="h2">
-          be{bull}nev{bull}o{bull}lent
-        </Typography>
-        <Typography className={classes.pos} color="textSecondary">
-          adjective
-        </Typography>
-        <Typography variant="body2" component="p">
-          well meaning and kindly.
-          <br />
-          {'"a benevolent smile"'}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions>
-    </Card>
+    <div className={classes.root}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <form
+              noValidate
+              autoComplete="on"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <input name="city" ref={register({ required: true })} />
+              {errors.city && <span>Questo valore è richiesto 🥺</span>}
+              <input type="submit"/>
+            </form>
+            <Typography variant="h5" component="h2">
+              🍃Il meteo di oggi per:
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper className={classes.paper}>
+            <Typography variant="h5" component="h2">
+              🌡Temperatura attuale:
+            </Typography>
+            <Typography variant="body2" component="p">
+              Temperatura Massima:
+            </Typography>
+            <Typography variant="body2" component="p">
+              Temperatura minima:
+            </Typography>
+            <Typography variant="body2" component="p">
+              Umidità:
+            </Typography>
+            <Typography variant="body2" component="p">
+              Pressione:
+            </Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper className={classes.paper}>
+            <Typography variant="h5" component="h2">
+              🌀Velocità del vento:
+            </Typography>
+            <Typography variant="body2" component="p">
+              🌞Alba:
+            </Typography>
+            <Typography variant="body2" component="p">
+              🌚Tramonto:
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </div>
   );
-}
+};

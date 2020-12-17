@@ -8,7 +8,7 @@ import "./App.css"
 const App: React.FC = () => {
   return (
     <div className="App">
-        <SearchAppBar title="Weather App!"/>
+        <SearchAppBar title="Il Meteo!"/>
         <CardComponent />
     </div>
   );
